@@ -1,0 +1,25 @@
+#!usr/bin/env python
+# -*- coding: Latin-1 -*-
+import csv
+import datetime
+
+MIN_DATE = datetime.datetime(year=2014, month=6, day=22) # This is the start date of the filter
+MAX_DATE = datetime.datetime(year=2014, month=7, day=22, hour=23, minute=59, second=59) # This is the end date of the filter
+
+
+def main():
+    # Here I read the file with *with* so the file descriptor closes once with ends.
+    with open('sample_data.csv', 'r') as fd:
+        reader = csv.DictReader(fd, delimiter=';')  # Here a class instance is created in memory, but it is not getting read yet.
+        dataset = list(reader)  # Here the read is done, the reader converts to a dictionary list.
+
+    dataset = filter(
+        lambda row: MIN_DATE < datetime.datetime.fromtimestamp(int(row['created_at'])) < MAX_DATE,
+        dataset
+    )  # Here the date filter is done.
+    dataset = sorted(dataset, key=lambda row: row['created_at'])  # Here is when the order by date is done.
+    print(' '.join([row['word'] for row in dataset]))  # And here the words from the filter are being extracted.
+
+
+if __name__ == '__main__':
+    main()
